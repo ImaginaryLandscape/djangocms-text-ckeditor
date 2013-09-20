@@ -7,6 +7,7 @@ from djangocms_text_ckeditor.widgets import TextEditorWidget
 from djangocms_text_ckeditor.models import Text
 from djangocms_text_ckeditor.utils import plugin_tags_to_user_html
 from djangocms_text_ckeditor.forms import TextForm
+from djangocms_text_ckeditor.settings import CKEDITOR_SETTINGS
 
 
 class TextPlugin(CMSPluginBase):
@@ -21,7 +22,15 @@ class TextPlugin(CMSPluginBase):
         Returns the Django form Widget to be used for
         the text area
         """
-        return TextEditorWidget(installed_plugins=plugins, pk=pk)
+        # Set textarea height to the value of height in the ck settings dict + 
+        # 106 (the approximate height of the editor skin with defaults)
+        if CKEDITOR_SETTINGS.get('height'):
+            attrs = {'style':'height: %spx' % 
+                str(int(CKEDITOR_SETTINGS.get('height'))+140)}
+        else:
+            attrs = None
+        return TextEditorWidget(installed_plugins=plugins, pk=pk, attrs=attrs)
+
 
     def get_form_class(self, request, plugins, pk):
         """
